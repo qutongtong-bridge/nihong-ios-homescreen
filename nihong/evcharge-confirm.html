@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>evcharge - 内容確認</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #000;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+
+        .back-button {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: absolute;
+            left: 20px;
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #00BCD4;
+        }
+
+        /* Progress Steps */
+        .progress-container {
+            background: #fff;
+            padding: 20px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .progress-dot.active {
+            background: #FF6B35;
+        }
+
+        .progress-dot.completed {
+            background: #FF6B35;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            width: 50px;
+            height: 1px;
+            background: #e0e0e0;
+            z-index: -1;
+        }
+
+        .progress-line.completed {
+            background: #FF6B35;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .progress-label.active {
+            color: #FF6B35;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px 20px 150px 20px; /* Reduced top padding and added bottom padding for button */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            overflow-y: auto;
+            height: calc(100% - 200px); /* Account for header and progress */
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #00BCD4;
+            text-align: center;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        /* Test Info Card */
+        .test-info-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 320px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .test-label {
+            color: #FF6B35;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .test-location {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Charger Info */
+        .charger-info-section {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 320px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .charger-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .charger-label {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .charger-number-icon {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #FF6B35;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #FF6B35;
+        }
+
+        .charger-details {
+            margin-left: 70px;
+        }
+
+        .charger-type {
+            font-size: 16px;
+            color: #FF6B35;
+            margin-bottom: 5px;
+        }
+
+        .charger-price-main {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .charger-price-max {
+            font-size: 14px;
+            color: #00BCD4;
+        }
+
+        /* Fee Section */
+        .fee-section {
+            margin-top: 20px;
+        }
+
+        .fee-label {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .fee-amount {
+            font-size: 18px;
+            color: #FF6B35;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .fee-estimate {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info-notices {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f0f8ff;
+            border-radius: 10px;
+        }
+
+        .notice-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        .notice-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .notice-icon {
+            color: #00BCD4;
+            font-size: 16px;
+            margin-top: 2px;
+        }
+
+        /* Payment Logo */
+        .payment-logo {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            font-weight: 600;
+            font-style: italic;
+            color: #666;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #666;
+        }
+
+        /* Next Button */
+        .next-button {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00BCD4;
+            color: #fff;
+            padding: 12px 35px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 188, 212, 0.3);
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .next-button:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span>7:12</span>
+                </div>
+                <div class="status-right">
+                    <span>📶</span>
+                    <span>📶</span>
+                    <span>🔋 100%</span>
+                </div>
+            </div>
+
+            <!-- Header -->
+            <div class="header">
+                <div class="back-button" onclick="goBack()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 18L9 12L15 6" stroke="#00BCD4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="header-title">充電前準備</div>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="progress-container">
+                <div class="progress-step">
+                    <div class="progress-dot completed"></div>
+                    <span class="progress-label">車室選択</span>
+                </div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step">
+                    <div class="progress-dot completed"></div>
+                    <span class="progress-label">出力選択</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                    <div class="progress-dot active"></div>
+                    <span class="progress-label active">内容確認</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                    <div class="progress-dot"></div>
+                    <span class="progress-label">入庫</span>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="section-title">
+                    SBPSテストの<br>利用を開始します。
+                </div>
+                
+                <div class="test-info-card">
+                    <div class="test-label">SBPSテスト</div>
+                    <div class="test-location">東京都品川区大崎２丁目１−１</div>
+                    <div class="payment-logo">'ayment</div>
+                </div>
+
+                <div class="charger-info-section">
+                    <div class="charger-header">
+                        <div class="charger-label">充電器</div>
+                        <div class="charger-number-icon">1</div>
+                        <div class="charger-icon">🔌</div>
+                    </div>
+                    
+                    <div class="charger-details">
+                        <div class="charger-type">普通 6kW(ケーブル有)</div>
+                        <div class="charger-price-main">¥100/15分</div>
+                        <div class="charger-price-max">(1日最大 ¥100,000)</div>
+                    </div>
+
+                    <div class="fee-section">
+                        <div class="fee-label">料金</div>
+                        <div class="fee-amount">利用料金：¥100/15分</div>
+                        <div class="fee-estimate">（ご請求予定合計料金：¥334）</div>
+                        
+                        <div class="info-notices">
+                            <div class="notice-item">
+                                <span class="notice-icon">⚠️</span>
+                                <span>実際の利用時間に応じて、合計料金が変動します。</span>
+                            </div>
+                            <div class="notice-item">
+                                <span class="notice-icon">⚠️</span>
+                                <span>利用開始から5分間、準備時間として無料でご利用頂けます</span>
+                            </div>
+                            <div class="notice-item">
+                                <span class="notice-icon">⚠️</span>
+                                <span>駐車料金が別途かかる場合があります</span>
+                            </div>
+                            <div class="notice-item">
+                                <span class="notice-icon">⚠️</span>
+                                <span>利用終了から10分経過後、超過料金が発生します</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Button -->
+            <button class="next-button" onclick="proceed()">次へ進む</button>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-button">☰</div>
+                <div class="nav-button">□</div>
+                <div class="nav-button">◀</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get charger number from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const chargerNumber = urlParams.get('charger') || '1';
+        
+        // Update charger number display
+        document.querySelector('.charger-number-icon').textContent = chargerNumber;
+        
+        // Update charger type based on selection
+        const chargerTypes = {
+            '1': '普通 6kW(ケーブル有)',
+            '2': '高級 6kW(ケーブル有)'
+        };
+        
+        const chargerPrices = {
+            '1': '(1日最大 ¥100,000)',
+            '2': '(1日最大 ¥150,000)'
+        };
+        
+        const chargerTypeElement = document.querySelector('.charger-type');
+        const chargerPriceElement = document.querySelector('.charger-price-max');
+        
+        if (chargerTypes[chargerNumber]) {
+            chargerTypeElement.textContent = chargerTypes[chargerNumber];
+        }
+        
+        if (chargerPrices[chargerNumber]) {
+            chargerPriceElement.textContent = chargerPrices[chargerNumber];
+        }
+
+        function goBack() {
+            window.location.href = 'evcharge-checkin.html';
+        }
+
+        function proceed() {
+            // Navigate to next step
+            alert('入庫画面へ進みます');
+            // window.location.href = 'evcharge-entry.html';
+        }
+    </script>
+</body>
+</html>

@@ -285,7 +285,7 @@
                 <div class="app-name">Myブラゴ</div>
             </div>
 
-            <div class="app-item">
+            <div class="app-item" onclick="openEvcharge()">
                 <div class="app-icon" style="background-color: #FF6D00;">
                     <div class="app-icon-placeholder">🔋</div>
                     <div class="app-badge">STAGING</div>
@@ -326,8 +326,14 @@
     </div>
 
     <script>
-        // Add click handlers
-        document.querySelectorAll('.app-item').forEach(app => {
+        // Function to open evcharge checkin page
+        function openEvcharge() {
+            event.stopPropagation();
+            window.location.href = 'evcharge-checkin.html';
+        }
+
+        // Add click handlers for other apps
+        document.querySelectorAll('.app-item:not([onclick])').forEach(app => {
             app.addEventListener('click', function() {
                 const appName = this.querySelector('.app-name').textContent;
                 console.log(`Clicked on ${appName}`);
