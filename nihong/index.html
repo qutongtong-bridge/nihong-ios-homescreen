@@ -249,7 +249,7 @@
                     </div>
                     <span class="app-name">Myブラゴ</span>
                 </div>
-                <div class="app-icon">
+                <div class="app-icon" onclick="openSettings()">
                     <div class="icon-wrapper settings-icon"></div>
                     <span class="app-name">設定</span>
                 </div>
@@ -285,6 +285,10 @@
     <script>
         function openEvcharge() {
             window.location.href = 'evcharge-search.html';
+        }
+        
+        function openSettings() {
+            window.location.href = 'settings.html';
         }
     </script>
 </body>
