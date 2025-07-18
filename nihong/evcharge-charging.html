@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>evcharge - 充電中</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #000;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px 20px 100px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: calc(100% - 44px);
+            position: relative;
+            overflow-y: auto;
+            gap: 15px;
+        }
+
+        /* Charging Status Title */
+        .charging-title {
+            font-size: 22px;
+            color: #00BCD4;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Timer Circle */
+        .timer-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin-bottom: 10px;
+        }
+
+        .timer-circle-bg {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: #e8f4f8;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .timer-circle {
+            width: 180px;
+            height: 180px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .timer-circle svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+            display: block;
+        }
+
+        .timer-circle circle {
+            fill: none;
+            stroke-width: 30;
+            stroke-linecap: round;
+        }
+
+        .timer-circle .bg-circle {
+            stroke: #e8f4f8;
+        }
+
+        .timer-circle .progress-circle {
+            stroke: #FF6B35;
+            stroke-dasharray: 471; /* 2 * PI * 75 (radius) */
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        .timer-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 150px;
+        }
+
+        .remaining-label {
+            font-size: 14px;
+            color: #00BCD4;
+            margin-bottom: 5px;
+        }
+
+        .remaining-time {
+            font-size: 42px;
+            color: #00BCD4;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .time-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .time-icon {
+            font-size: 20px;
+            color: #999;
+        }
+
+        .time-icon.active {
+            color: #FF6B35;
+        }
+
+        /* Section Containers */
+        .top-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .middle-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+        }
+
+        /* Stop Button */
+        .stop-button {
+            background: #fff;
+            border: none;
+            color: #FF6B35;
+            padding: 15px 50px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .stop-button:active {
+            transform: scale(0.95);
+        }
+
+        .stop-help {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .help-icon {
+            width: 20px;
+            height: 20px;
+            background: #666;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Usage Status */
+        .usage-status {
+            position: absolute;
+            bottom: 60px;
+            left: 20px;
+            right: 20px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .usage-title {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .usage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .usage-item:last-child {
+            border-bottom: none;
+        }
+
+        .usage-label {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .usage-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+
+        /* Animation */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .charging-dots {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: flex-end;
+            justify-content: center;
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background: #fff;
+            border-radius: 30px 30px 0 0;
+            padding: 30px 20px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #00BCD4;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 25px;
+            padding-right: 20px;
+        }
+
+        /* Finish Illustration */
+        .finish-illustration {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            height: 180px;
+        }
+        
+        /* Caution Illustration */
+        .caution-illustration {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            height: 200px;
+        }
+        
+        .caution-text {
+            font-size: 36px;
+            color: #00BCD4;
+            font-weight: 700;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .caution-person {
+            position: relative;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        
+        .person-body-white {
+            width: 100px;
+            height: 120px;
+            background: #e0e0e0;
+            border-radius: 50px 50px 0 0;
+            position: relative;
+        }
+        
+        .person-hand {
+            position: absolute;
+            right: -20px;
+            top: 30px;
+            width: 40px;
+            height: 60px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            transform: rotate(-30deg);
+        }
+        
+        .caution-bubble {
+            position: absolute;
+            right: -40px;
+            top: -20px;
+            width: 60px;
+            height: 60px;
+            background: #FF6B35;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .caution-description {
+            font-size: 16px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .caution-warning {
+            font-size: 14px;
+            color: #FF6B35;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .end-button {
+            background: #FF6B35;
+            color: #fff;
+            border: none;
+        }
+        
+        .end-button:active {
+            background: #e55a2b;
+        }
+
+        .finish-text {
+            font-size: 32px;
+            color: #00BCD4;
+            font-weight: 700;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .finish-icons {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 30px;
+            height: 120px;
+            position: relative;
+        }
+
+        .car-icon {
+            width: 100px;
+            height: 50px;
+            background: #e0e0e0;
+            border-radius: 20px 20px 10px 10px;
+            position: relative;
+            align-self: flex-end;
+        }
+
+        .car-icon::before,
+        .car-icon::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 20px;
+            height: 20px;
+            background: #666;
+            border-radius: 50%;
+        }
+
+        .car-icon::before {
+            left: 15px;
+        }
+
+        .car-icon::after {
+            right: 15px;
+        }
+
+        .car-window {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .charger-station {
+            width: 35px;
+            height: 70px;
+            background: #666;
+            border-radius: 10px;
+            position: relative;
+            align-self: flex-end;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .charger-station::before {
+            content: '⚡';
+            color: #fff;
+            font-size: 20px;
+            position: absolute;
+            top: 10px;
+        }
+
+        .charger-cable {
+            position: absolute;
+            bottom: 20px;
+            left: -15px;
+            width: 20px;
+            height: 3px;
+            background: #333;
+        }
+
+        .person-icon {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .person-head {
+            width: 30px;
+            height: 30px;
+            background: #00BCD4;
+            border-radius: 50%;
+            margin-bottom: -5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .person-question {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .person-body {
+            width: 35px;
+            height: 45px;
+            background: #FF6B35;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+        }
+
+        .modal-description {
+            font-size: 15px;
+            color: #00BCD4;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .modal-ok-button {
+            display: block;
+            width: 100%;
+            background: #fff;
+            border: 2px solid #FF6B35;
+            color: #FF6B35;
+            padding: 15px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .modal-ok-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button {
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span>7:12</span>
+                </div>
+                <div class="status-right">
+                    <span>📶</span>
+                    <span>📶</span>
+                    <span>🔋 100%</span>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Top Section -->
+                <div class="top-section">
+                    <div class="charging-title">充電可能です<span class="charging-dots">...</span></div>
+                    <!-- Timer Circle -->
+                    <div class="timer-container">
+                        <div class="timer-circle-bg"></div>
+                        <div class="timer-circle">
+                            <svg viewBox="0 0 180 180">
+                                <circle class="bg-circle" cx="90" cy="90" r="75"></circle>
+                                <circle class="progress-circle" cx="90" cy="90" r="75"></circle>
+                            </svg>
+                        </div>
+                        <div class="timer-content">
+                            <div class="remaining-label">残り時間</div>
+                            <div class="remaining-time">0:27</div>
+                            <div class="time-icons">
+                                <span class="time-icon">⏰</span>
+                                <span class="time-icon">=</span>
+                                <span class="time-icon active">⏱️</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Section -->
+                <div class="middle-section">
+                    <button class="stop-button" onclick="stopCharging()">利用を終了する</button>
+                    <div class="stop-help">
+                        <div class="help-icon">?</div>
+                        <span>利用を終了するには</span>
+                    </div>
+                </div>
+
+                <!-- Usage Status (Bottom Section) -->
+                <div class="usage-status">
+                    <div class="usage-title">利用状況</div>
+                    <div class="usage-item">
+                        <span class="usage-label">利用開始時刻</span>
+                        <span class="usage-value">19:12</span>
+                    </div>
+                    <div class="usage-item">
+                        <span class="usage-label">利用終了時刻</span>
+                        <span class="usage-value">19:40</span>
+                    </div>
+                    <div class="usage-item">
+                        <span class="usage-label">利用時間(1分未満切り上げ)</span>
+                        <span class="usage-value">1分</span>
+                    </div>
+                    <div class="usage-item">
+                        <span class="usage-label">うち無料時間(準備時間として)</span>
+                        <span class="usage-value">-1分</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Overlay 1 -->
+            <div class="modal-overlay" id="modalOverlay1">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                    <h2 class="modal-title">利用を終了するには？</h2>
+                    
+                    <div class="finish-illustration">
+                        <div class="finish-text">FINISH!</div>
+                        <div class="finish-icons">
+                            <div class="car-icon">
+                                <div class="car-window"></div>
+                            </div>
+                            <div class="charger-station">
+                                <div class="charger-cable"></div>
+                            </div>
+                            <div class="person-icon">
+                                <div class="person-head">
+                                    <span class="person-question">?</span>
+                                </div>
+                                <div class="person-body"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="modal-description">
+                        充電器を抜いてそのまま車室から退出する、<br>
+                        または、「利用を終了する」ボタンを押すと、<br>
+                        利用を終了することができます。
+                    </p>
+                    
+                    <button class="modal-ok-button" onclick="showSecondModal()">OK</button>
+                </div>
+            </div>
+            
+            <!-- Modal Overlay 2 -->
+            <div class="modal-overlay" id="modalOverlay2">
+                <div class="modal-content">
+                    <button class="modal-close" onclick="closeAllModals()">×</button>
+                    <h2 class="modal-title">利用終了後は、EV車室から<br>ご退出ください。</h2>
+                    
+                    <div class="caution-illustration">
+                        <div class="caution-text">CAUTION</div>
+                        <div class="caution-person">
+                            <div class="person-body-white"></div>
+                            <div class="person-hand"></div>
+                            <div class="caution-bubble">!</div>
+                        </div>
+                    </div>
+                    
+                    <p class="caution-description">
+                        準備が整ってから利用を終了してください。
+                    </p>
+                    
+                    <p class="caution-warning">
+                        ※終了後もEV車室に停車されている場合、<br>
+                        ペナルティ料金の発生や、アカウント停止<br>
+                        をする場合があります。
+                    </p>
+                    
+                    <button class="modal-ok-button end-button" onclick="endCharging()">利用を終了する</button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-button">☰</div>
+                <div class="nav-button">□</div>
+                <div class="nav-button" onclick="window.history.back()">◀</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const chargerNumber = urlParams.get('charger') || '1';
+        const powerLevel = urlParams.get('power') || '6';
+
+        // Timer variables
+        let startTime = new Date();
+        let duration = 28 * 60; // 28 minutes in seconds
+        let remainingTime = duration;
+        let timerInterval;
+
+        // Format time display
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Update timer display
+        function updateTimer() {
+            const elapsed = Math.floor((new Date() - startTime) / 1000);
+            remainingTime = Math.max(0, duration - elapsed);
+            
+            // Update time display
+            document.querySelector('.remaining-time').textContent = formatTime(remainingTime);
+            
+            // Update progress circle
+            const progressCircle = document.querySelector('.progress-circle');
+            const circumference = 2 * Math.PI * 75; // 2πr
+            const progress = (duration - remainingTime) / duration;
+            const offset = circumference * (1 - progress);
+            progressCircle.style.strokeDashoffset = offset;
+            
+            // Update usage info
+            const usageMinutes = Math.ceil(elapsed / 60);
+            document.querySelector('.usage-item:nth-child(3) .usage-value').textContent = `${usageMinutes}分`;
+            
+            // Calculate free time
+            const freeTime = Math.min(5, usageMinutes);
+            document.querySelector('.usage-item:nth-child(4) .usage-value').textContent = `-${freeTime}分`;
+            
+            // Stop timer when time is up
+            if (remainingTime === 0) {
+                clearInterval(timerInterval);
+                alert('充電時間が終了しました。');
+            }
+        }
+
+        // Start timer
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer(); // Initial update
+
+        // Update start and end times
+        const now = new Date();
+        const endTime = new Date(now.getTime() + duration * 1000);
+        
+        document.querySelector('.usage-item:nth-child(1) .usage-value').textContent = 
+            `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+        document.querySelector('.usage-item:nth-child(2) .usage-value').textContent = 
+            `${endTime.getHours()}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+
+        // Stop charging function
+        function stopCharging() {
+            // Show first modal
+            document.getElementById('modalOverlay1').classList.add('active');
+        }
+
+        // Show second modal
+        function showSecondModal() {
+            document.getElementById('modalOverlay1').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('modalOverlay2').classList.add('active');
+            }, 300);
+        }
+
+        // Close all modals
+        function closeAllModals() {
+            document.getElementById('modalOverlay1').classList.remove('active');
+            document.getElementById('modalOverlay2').classList.remove('active');
+        }
+
+        // End charging and go to complete page
+        function endCharging() {
+            clearInterval(timerInterval);
+            // Calculate duration in minutes
+            const elapsed = Math.floor((new Date() - startTime) / 1000);
+            const durationMinutes = Math.ceil(elapsed / 60);
+            
+            // Navigate to complete page with parameters
+            window.location.href = `evcharge-complete.html?charger=${chargerNumber}&power=${powerLevel}&duration=${durationMinutes}`;
+        }
+
+        // Handle modal click outside
+        document.getElementById('modalOverlay1').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAllModals();
+            }
+        });
+        
+        document.getElementById('modalOverlay2').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAllModals();
+            }
+        });
+    </script>
+</body>
+</html>

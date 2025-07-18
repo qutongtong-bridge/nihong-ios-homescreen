@@ -151,12 +151,13 @@
 
         /* Main Content */
         .main-content {
-            padding: 60px 20px 40px 20px;
+            padding: 60px 20px 100px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 50px;
             height: calc(100% - 180px);
+            overflow-y: auto;
         }
 
         .selection-prompt {
@@ -234,6 +235,27 @@
             font-size: 20px;
             font-weight: bold;
         }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button {
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -303,6 +325,13 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-button">☰</div>
+                <div class="nav-button">□</div>
+                <div class="nav-button" onclick="window.history.back()">◀</div>
             </div>
         </div>
     </div>

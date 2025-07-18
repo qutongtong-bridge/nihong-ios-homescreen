@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>evcharge - 充電終了</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #000;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 10px 20px 100px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: calc(100% - 44px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Thank You Section */
+        .thank-you-section {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .usage-complete {
+            font-size: 16px;
+            color: #00BCD4;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .thank-you-message {
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* Illustration */
+        .illustration-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            height: 120px;
+            margin-bottom: 10px;
+            background: linear-gradient(to bottom, #f0f8ff 0%, #f5f5f5 100%);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        /* Trees */
+        .tree {
+            position: absolute;
+            bottom: 10px;
+        }
+
+        .tree-trunk {
+            width: 5px;
+            height: 15px;
+            background: #8B4513;
+            margin: 0 auto;
+        }
+
+        .tree-leaves {
+            width: 25px;
+            height: 30px;
+            background: #00BCD4;
+            border-radius: 50% 50% 0 0;
+            margin-bottom: -3px;
+            box-shadow: 0 2px 5px rgba(0, 188, 212, 0.2);
+        }
+
+        .tree1 {
+            left: 15px;
+        }
+
+        .tree2 {
+            left: 70px;
+        }
+
+        .tree2 .tree-leaves {
+            width: 30px;
+            height: 35px;
+        }
+
+        .tree3 {
+            right: 50px;
+        }
+
+        .tree3 .tree-leaves {
+            width: 28px;
+            height: 32px;
+        }
+
+        /* Road and Car */
+        .road {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            height: 50px;
+            background: #e8e8e8;
+            border-radius: 8px;
+        }
+
+        .road-line {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            right: 10px;
+            height: 2px;
+            background: repeating-linear-gradient(
+                to right,
+                #fff,
+                #fff 10px,
+                transparent 10px,
+                transparent 20px
+            );
+        }
+
+        /* Car */
+        .car-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            animation: driveAway 4s ease-in-out infinite;
+        }
+
+        @keyframes driveAway {
+            0%, 100% {
+                transform: translateX(0) scale(1);
+            }
+            50% {
+                transform: translateX(-30px) scale(0.95);
+            }
+        }
+
+        .car {
+            width: 70px;
+            height: 35px;
+            background: #f0f0f0;
+            border-radius: 20px 20px 10px 10px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .car-window {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 15px;
+            background: #4a4a4a;
+            border-radius: 10px;
+        }
+
+        .car-person1 {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            width: 10px;
+            height: 10px;
+            background: #FF6B35;
+            border-radius: 50%;
+        }
+
+        .car-person2 {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            width: 10px;
+            height: 10px;
+            background: #00BCD4;
+            border-radius: 50%;
+        }
+
+        .car-wheel {
+            position: absolute;
+            bottom: -4px;
+            width: 12px;
+            height: 12px;
+            background: #666;
+            border-radius: 50%;
+        }
+
+        .car-wheel.front {
+            left: 10px;
+        }
+
+        .car-wheel.rear {
+            right: 10px;
+        }
+
+        /* Thank You Bubble */
+        .thank-bubble {
+            position: absolute;
+            bottom: 60px;
+            right: 30px;
+            background: #00BCD4;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            font-style: italic;
+            box-shadow: 0 4px 10px rgba(0, 188, 212, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .thank-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #00BCD4;
+        }
+
+        /* Charging Station */
+        .charging-station {
+            position: absolute;
+            bottom: 10px;
+            right: 25px;
+            width: 30px;
+            height: 60px;
+            background: #757575;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .charging-station::before {
+            content: '⚡';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .charging-cable {
+            position: absolute;
+            bottom: 20px;
+            left: -25px;
+            width: 30px;
+            height: 3px;
+            background: #444;
+            border-radius: 2px;
+        }
+
+        /* Arrows */
+        .arrows {
+            position: absolute;
+            bottom: 45px;
+            right: 80px;
+            color: #00BCD4;
+            font-size: 20px;
+            font-weight: bold;
+            animation: moveArrows 2s ease-in-out infinite;
+        }
+        
+        @keyframes moveArrows {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(-5px);
+            }
+        }
+
+        /* Total Amount */
+        .total-section {
+            background: #fff;
+            border-radius: 15px;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .total-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .total-amount {
+            font-size: 24px;
+            color: #FF6B35;
+            font-weight: 600;
+        }
+
+        /* Usage Details */
+        .usage-details {
+            background: #fff;
+            border-radius: 15px;
+            padding: 8px 12px;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 4px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .detail-value {
+            font-size: 11px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .location-icon {
+            margin-right: 5px;
+        }
+
+        /* Buttons */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .ok-button {
+            background: #fff;
+            border: 2px solid #FF6B35;
+            color: #FF6B35;
+            padding: 12px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ok-button:active {
+            transform: scale(0.95);
+        }
+
+        .receipt-button {
+            background: #00BCD4;
+            border: none;
+            color: #fff;
+            padding: 12px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .receipt-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button {
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span>7:13</span>
+                </div>
+                <div class="status-right">
+                    <span>📶</span>
+                    <span>📶</span>
+                    <span>🔋 100%</span>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Thank You Section -->
+                <div class="thank-you-section">
+                    <div class="usage-complete">ご利用</div>
+                    <div class="thank-you-message">ありがとうございました。</div>
+                </div>
+
+                <!-- Illustration -->
+                <div class="illustration-container">
+                    <!-- Trees -->
+                    <div class="tree tree1">
+                        <div class="tree-leaves"></div>
+                        <div class="tree-trunk"></div>
+                    </div>
+                    <div class="tree tree2">
+                        <div class="tree-leaves"></div>
+                        <div class="tree-trunk"></div>
+                    </div>
+                    <div class="tree tree3">
+                        <div class="tree-leaves"></div>
+                        <div class="tree-trunk"></div>
+                    </div>
+
+                    <!-- Road -->
+                    <div class="road">
+                        <div class="road-line"></div>
+                    </div>
+
+                    <!-- Car -->
+                    <div class="car-container">
+                        <div class="car">
+                            <div class="car-window"></div>
+                            <div class="car-person1"></div>
+                            <div class="car-person2"></div>
+                            <div class="car-wheel front"></div>
+                            <div class="car-wheel rear"></div>
+                        </div>
+                    </div>
+
+                    <!-- Thank You Bubble -->
+                    <div class="thank-bubble">THANK YOU</div>
+
+                    <!-- Charging Station -->
+                    <div class="charging-station">
+                        <div class="charging-cable"></div>
+                    </div>
+
+                    <!-- Arrows -->
+                    <div class="arrows">◀◀◀</div>
+                </div>
+
+                <!-- Content Container -->
+                <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Total Amount -->
+                    <div class="total-section">
+                        <div class="total-label">料金合計</div>
+                        <div class="total-amount">¥500</div>
+                    </div>
+
+                    <!-- Usage Details -->
+                    <div class="usage-details">
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            <span class="location-icon">📍</span>SBPSテスト
+                        </span>
+                        <span class="detail-value"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            <span class="location-icon">🕒</span>2024/2/15(木) 19:12～19:13
+                        </span>
+                        <span class="detail-value"></span>
+                    </div>
+                    </div>
+
+                    <div class="usage-details">
+                        <div class="detail-item">
+                            <span class="detail-label">利用料金</span>
+                            <span class="detail-value">¥0</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">予約料金</span>
+                            <span class="detail-value">¥500</span>
+                        </div>
+                        </div>
+
+                    <div class="usage-details">
+                        <div class="detail-item">
+                            <span class="detail-label">料金単価</span>
+                            <span class="detail-value">¥100/15分</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">充電サービス利用時間</span>
+                            <span class="detail-value">0分<br><span style="font-size: 12px; color: #999;">(無料時間5分を除く)</span></span>
+                        </div>
+                        </div>
+
+                    <!-- Buttons -->
+                    <div class="button-container">
+                    <button class="ok-button" onclick="goHome()">OK</button>
+                        <button class="receipt-button" onclick="showReceipt()">領収書を発行する</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-button">☰</div>
+                <div class="nav-button">□</div>
+                <div class="nav-button" onclick="window.history.back()">◀</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const chargerNumber = urlParams.get('charger') || '1';
+        const powerLevel = urlParams.get('power') || '6';
+        const duration = urlParams.get('duration') || '1';
+
+        // Calculate and update the total amount based on duration
+        function updateTotalAmount() {
+            const basePrice = powerLevel === '3' ? 50 : 100; // Price per 15 minutes
+            const minutes = parseInt(duration);
+            const freeMinutes = 5;
+            const chargeableMinutes = Math.max(0, minutes - freeMinutes);
+            const periods = Math.ceil(chargeableMinutes / 15);
+            const usageFee = periods * basePrice;
+            const reservationFee = 500;
+            const total = usageFee + reservationFee;
+
+            // Update display
+            document.querySelector('.total-amount').textContent = `¥${total}`;
+            document.querySelector('.detail-item:nth-child(1) .detail-value').textContent = `¥${usageFee}`;
+            
+            // Update time display
+            const now = new Date();
+            const startTime = new Date(now.getTime() - minutes * 60 * 1000);
+            const dateStr = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+            const dayStr = ['日', '月', '火', '水', '木', '金', '土'][now.getDay()];
+            const startTimeStr = `${startTime.getHours()}:${startTime.getMinutes().toString().padStart(2, '0')}`;
+            const endTimeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            document.querySelector('.usage-details .detail-item:nth-child(2) .detail-label').innerHTML = 
+                `<span class="location-icon">🕒</span>${dateStr}(${dayStr}) ${startTimeStr}～${endTimeStr}`;
+            
+            // Update chargeable time
+            const chargeableTimeElement = document.querySelector('.usage-details:last-child .detail-item:nth-child(2) .detail-value');
+            chargeableTimeElement.innerHTML = `${chargeableMinutes}分<br><span style="font-size: 12px; color: #999;">(無料時間${freeMinutes}分を除く)</span>`;
+        }
+
+        // Initialize the page
+        updateTotalAmount();
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        function showReceipt() {
+            // Navigate to receipt page with total amount
+            const totalElement = document.querySelector('.total-amount');
+            const totalAmount = totalElement.textContent.replace('¥', '');
+            window.location.href = `evcharge-receipt.html?charger=${chargerNumber}&power=${powerLevel}&duration=${duration}&total=${totalAmount}`;
+        }
+    </script>
+</body>
+</html>

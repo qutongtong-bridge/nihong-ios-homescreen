@@ -313,7 +313,7 @@
         /* Next Button */
         .next-button {
             position: absolute;
-            bottom: 30px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
             background: #00BCD4;
@@ -331,6 +331,27 @@
 
         .next-button:active {
             transform: translateX(-50%) scale(0.95);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button {
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
         }
     </style>
 </head>
@@ -437,6 +458,12 @@
             <!-- Next Button -->
             <button class="next-button" onclick="proceed()">次へ進む</button>
 
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-button">☰</div>
+                <div class="nav-button">□</div>
+                <div class="nav-button" onclick="window.history.back()">◀</div>
+            </div>
         </div>
     </div>
 
@@ -481,9 +508,10 @@
         }
 
         function proceed() {
-            // Navigate to entry page with charger number
+            // Navigate to entry page with charger number and power level
             const chargerNumber = urlParams.get('charger') || '1';
-            window.location.href = `evcharge-entry.html?charger=${chargerNumber}`;
+            const powerLevel = urlParams.get('power') || '6';
+            window.location.href = `evcharge-entry.html?charger=${chargerNumber}&power=${powerLevel}`;
         }
     </script>
 </body>

@@ -141,11 +141,11 @@
 
         /* Main Content */
         .main-content {
-            padding: 40px 20px;
+            padding: 20px 20px 60px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 40px;
+            gap: 20px;
             height: calc(100% - 160px);
             overflow-y: auto;
         }
@@ -154,26 +154,26 @@
         .parking-illustration {
             background: #fff;
             border-radius: 20px;
-            padding: 30px;
+            padding: 20px;
             width: 100%;
             max-width: 320px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .parking-visual {
             position: relative;
             width: 100%;
-            height: 250px;
+            height: 180px;
         }
 
         /* Trees */
         .tree {
             position: absolute;
-            width: 40px;
-            height: 50px;
+            width: 30px;
+            height: 40px;
             background: #00BCD4;
             border-radius: 50% 50% 0 0;
         }
@@ -181,24 +181,24 @@
         .tree::after {
             content: '';
             position: absolute;
-            bottom: -10px;
+            bottom: -8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 8px;
-            height: 15px;
+            width: 6px;
+            height: 12px;
             background: #8B4513;
         }
 
-        .tree1 { top: 10px; left: 20px; }
-        .tree2 { top: 10px; left: 80px; }
-        .tree3 { top: 10px; right: 80px; }
-        .tree4 { top: 10px; right: 20px; }
+        .tree1 { top: 5px; left: 15px; }
+        .tree2 { top: 5px; left: 70px; }
+        .tree3 { top: 5px; right: 70px; }
+        .tree4 { top: 5px; right: 15px; }
 
         /* Parking Spots */
         .parking-spot {
             position: absolute;
-            width: 60px;
-            height: 100px;
+            width: 50px;
+            height: 80px;
             background: #f0f0f0;
             border: 2px solid #ddd;
             border-radius: 10px;
@@ -208,24 +208,24 @@
         }
 
         .parking-spot1 {
-            top: 80px;
+            top: 60px;
             left: 20px;
         }
 
         .parking-spot2 {
-            top: 80px;
-            left: 100px;
+            top: 60px;
+            left: 90px;
         }
 
         .parking-spot3 {
-            top: 80px;
+            top: 60px;
             right: 20px;
         }
 
         /* Cars */
         .car {
-            width: 50px;
-            height: 80px;
+            width: 40px;
+            height: 65px;
             background: #333;
             border-radius: 10px;
             position: relative;
@@ -235,20 +235,20 @@
         .car::after {
             content: '';
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: #666;
             border-radius: 50%;
         }
 
         .car::before {
-            bottom: 10px;
-            left: 10px;
+            bottom: 8px;
+            left: 8px;
         }
 
         .car::after {
-            bottom: 10px;
-            right: 10px;
+            bottom: 8px;
+            right: 8px;
         }
 
         /* Active Car with Animation */
@@ -270,32 +270,32 @@
         /* Charging Station */
         .charging-station {
             position: absolute;
-            width: 30px;
-            height: 40px;
+            width: 25px;
+            height: 35px;
             background: #666;
             border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 20px;
+            font-size: 16px;
         }
 
-        .station1 { top: 90px; left: 85px; }
-        .station2 { top: 90px; left: 165px; }
-        .station3 { top: 90px; right: 50px; }
+        .station1 { top: 70px; left: 75px; }
+        .station2 { top: 70px; left: 145px; }
+        .station3 { top: 70px; right: 45px; }
 
         /* Parking Bubble */
         .parking-bubble {
             position: absolute;
-            top: 100px;
+            top: 80px;
             left: 50%;
             transform: translateX(-50%);
             background: #00BCD4;
             color: #fff;
-            padding: 15px 25px;
+            padding: 10px 20px;
             border-radius: 25px;
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 600;
             font-style: italic;
             box-shadow: 0 4px 10px rgba(0, 188, 212, 0.3);
@@ -317,10 +317,10 @@
         /* Arrows */
         .arrow {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
+            bottom: 15px;
+            left: 15px;
             color: #00BCD4;
-            font-size: 30px;
+            font-size: 24px;
             font-weight: bold;
             animation: blink 1s infinite;
         }
@@ -337,25 +337,25 @@
         }
 
         .instruction-text {
-            font-size: 18px;
+            font-size: 16px;
             color: #00BCD4;
-            line-height: 1.6;
-            margin-bottom: 20px;
+            line-height: 1.5;
+            margin-bottom: 15px;
         }
 
         /* OK Button */
         .ok-button {
             background: #fff;
             color: #FF6B35;
-            padding: 15px 60px;
+            padding: 12px 50px;
             border-radius: 30px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
             border: 2px solid #FF6B35;
             box-shadow: 0 4px 10px rgba(255, 107, 53, 0.2);
             transition: all 0.3s;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .ok-button:active {
@@ -365,10 +365,10 @@
         /* Bottom Navigation */
         .bottom-nav {
             position: absolute;
-            bottom: 20px;
+            bottom: 0;
             left: 0;
             right: 0;
-            height: 60px;
+            height: 50px;
             background: #fff;
             display: flex;
             justify-content: space-around;
@@ -377,9 +377,9 @@
         }
 
         .nav-button {
-            padding: 10px 20px;
+            padding: 5px 15px;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 20px;
             color: #666;
         }
     </style>
@@ -476,7 +476,7 @@
             <div class="bottom-nav">
                 <div class="nav-button">☰</div>
                 <div class="nav-button">□</div>
-                <div class="nav-button">◀</div>
+                <div class="nav-button" onclick="window.history.back()">◀</div>
             </div>
         </div>
     </div>
@@ -487,9 +487,10 @@
         const chargerNumber = urlParams.get('charger') || '1';
 
         function completeParking() {
-            // Here you can navigate to the next step or completion page
-            alert('駐車が完了しました！充電を開始します。');
-            // window.location.href = 'evcharge-complete.html';
+            // Navigate to charging page with parameters
+            const chargerNumber = urlParams.get('charger') || '1';
+            const powerLevel = urlParams.get('power') || '6';
+            window.location.href = `evcharge-charging.html?charger=${chargerNumber}&power=${powerLevel}`;
         }
 
         // Animate car entry after page load
