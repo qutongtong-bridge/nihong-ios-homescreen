@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>evcharge - 出力選択</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #000;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+
+        .back-button {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: absolute;
+            left: 20px;
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #00BCD4;
+        }
+
+        /* Progress Steps */
+        .progress-container {
+            background: #fff;
+            padding: 20px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .progress-dot.active {
+            background: #FF6B35;
+        }
+
+        .progress-dot.completed {
+            background: #FF6B35;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            width: 50px;
+            height: 1px;
+            background: #e0e0e0;
+            z-index: -1;
+        }
+
+        .progress-line.completed {
+            background: #FF6B35;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .progress-label.active {
+            color: #FF6B35;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 60px 20px 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+            height: calc(100% - 180px);
+        }
+
+        .selection-prompt {
+            font-size: 22px;
+            color: #00BCD4;
+            text-align: center;
+        }
+
+        /* Power Options */
+        .power-options {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .power-option {
+            background: #fff;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .power-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .power-option:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .power-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #00BCD4;
+            margin-bottom: 10px;
+        }
+
+        .power-price {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .power-max {
+            color: #00BCD4;
+        }
+
+        /* Selected State */
+        .power-option.selected {
+            border: 2px solid #00BCD4;
+            background: #f0fbfc;
+        }
+
+        .power-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            background: #00BCD4;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span>7:12</span>
+                </div>
+                <div class="status-right">
+                    <span>📶</span>
+                    <span>📶</span>
+                    <span>🔋 100%</span>
+                </div>
+            </div>
+
+            <!-- Header -->
+            <div class="header">
+                <div class="back-button" onclick="goBack()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 18L9 12L15 6" stroke="#00BCD4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="header-title">充電前準備</div>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="progress-container">
+                <div class="progress-step">
+                    <div class="progress-dot completed"></div>
+                    <span class="progress-label">車室選択</span>
+                </div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step">
+                    <div class="progress-dot active"></div>
+                    <span class="progress-label active">出力選択</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                    <div class="progress-dot"></div>
+                    <span class="progress-label">内容確認</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                    <div class="progress-dot"></div>
+                    <span class="progress-label">入庫</span>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="selection-prompt">出力電力を選択してください。</div>
+                
+                <div class="power-options">
+                    <div class="power-option" data-power="6" onclick="selectPower(6)">
+                        <div class="power-value">6kW</div>
+                        <div class="power-price">
+                            ¥100/15分 <span class="power-max">(1日最大 ¥100,000)</span>
+                        </div>
+                    </div>
+
+                    <div class="power-option" data-power="3" onclick="selectPower(3)">
+                        <div class="power-value">3kW</div>
+                        <div class="power-price">
+                            ¥50/15分 <span class="power-max">(1日最大 ¥50,000)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get charger number from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const chargerNumber = urlParams.get('charger') || '1';
+
+        function goBack() {
+            window.location.href = 'evcharge-checkin.html';
+        }
+
+        function selectPower(power) {
+            // Add visual feedback
+            const options = document.querySelectorAll('.power-option');
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            const selectedOption = document.querySelector(`[data-power="${power}"]`);
+            selectedOption.classList.add('selected');
+            
+            // Navigate to confirmation page with both charger number and power
+            setTimeout(() => {
+                window.location.href = `evcharge-confirm.html?charger=${chargerNumber}&power=${power}`;
+            }, 300);
+        }
+    </script>
+</body>
+</html>

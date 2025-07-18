@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>evcharge - 入庫</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #000;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #00BCD4;
+        }
+
+        /* Progress Steps */
+        .progress-container {
+            background: #fff;
+            padding: 20px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .progress-dot.completed {
+            background: #FF6B35;
+        }
+
+        .progress-dot.current {
+            background: #fff;
+            border: 2px solid #FF6B35;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            width: 50px;
+            height: 1px;
+            background: #e0e0e0;
+            z-index: -1;
+        }
+
+        .progress-line.completed {
+            background: #FF6B35;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .progress-label.active {
+            color: #FF6B35;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            height: calc(100% - 160px);
+            overflow-y: auto;
+        }
+
+        /* Parking Illustration */
+        .parking-illustration {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .parking-visual {
+            position: relative;
+            width: 100%;
+            height: 250px;
+        }
+
+        /* Trees */
+        .tree {
+            position: absolute;
+            width: 40px;
+            height: 50px;
+            background: #00BCD4;
+            border-radius: 50% 50% 0 0;
+        }
+
+        .tree::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 15px;
+            background: #8B4513;
+        }
+
+        .tree1 { top: 10px; left: 20px; }
+        .tree2 { top: 10px; left: 80px; }
+        .tree3 { top: 10px; right: 80px; }
+        .tree4 { top: 10px; right: 20px; }
+
+        /* Parking Spots */
+        .parking-spot {
+            position: absolute;
+            width: 60px;
+            height: 100px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .parking-spot1 {
+            top: 80px;
+            left: 20px;
+        }
+
+        .parking-spot2 {
+            top: 80px;
+            left: 100px;
+        }
+
+        .parking-spot3 {
+            top: 80px;
+            right: 20px;
+        }
+
+        /* Cars */
+        .car {
+            width: 50px;
+            height: 80px;
+            background: #333;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .car::before,
+        .car::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #666;
+            border-radius: 50%;
+        }
+
+        .car::before {
+            bottom: 10px;
+            left: 10px;
+        }
+
+        .car::after {
+            bottom: 10px;
+            right: 10px;
+        }
+
+        /* Active Car with Animation */
+        .car-active {
+            animation: driveIn 2s ease-out;
+        }
+
+        @keyframes driveIn {
+            from {
+                transform: translateY(150px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Charging Station */
+        .charging-station {
+            position: absolute;
+            width: 30px;
+            height: 40px;
+            background: #666;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .station1 { top: 90px; left: 85px; }
+        .station2 { top: 90px; left: 165px; }
+        .station3 { top: 90px; right: 50px; }
+
+        /* Parking Bubble */
+        .parking-bubble {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00BCD4;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 20px;
+            font-weight: 600;
+            font-style: italic;
+            box-shadow: 0 4px 10px rgba(0, 188, 212, 0.3);
+        }
+
+        .parking-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #00BCD4;
+        }
+
+        /* Arrows */
+        .arrow {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #00BCD4;
+            font-size: 30px;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Instructions */
+        .instructions {
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .instruction-text {
+            font-size: 18px;
+            color: #00BCD4;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* OK Button */
+        .ok-button {
+            background: #fff;
+            color: #FF6B35;
+            padding: 15px 60px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid #FF6B35;
+            box-shadow: 0 4px 10px rgba(255, 107, 53, 0.2);
+            transition: all 0.3s;
+            margin-top: 30px;
+        }
+
+        .ok-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span>7:12</span>
+                </div>
+                <div class="status-right">
+                    <span>📶</span>
+                    <span>📶</span>
+                    <span>🔋 100%</span>
+                </div>
+            </div>
+
+            <!-- Header -->
+            <div class="header">
+                <div class="header-title">充電前準備</div>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="progress-container">
+                <div class="progress-step">
+                    <div class="progress-dot completed"></div>
+                    <span class="progress-label">車室選択</span>
+                </div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step">
+                    <div class="progress-dot completed"></div>
+                    <span class="progress-label">出力選択</span>
+                </div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step">
+                    <div class="progress-dot completed"></div>
+                    <span class="progress-label">内容確認</span>
+                </div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step">
+                    <div class="progress-dot current"></div>
+                    <span class="progress-label active">入庫</span>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="parking-illustration">
+                    <div class="parking-visual">
+                        <!-- Trees -->
+                        <div class="tree tree1"></div>
+                        <div class="tree tree2"></div>
+                        <div class="tree tree3"></div>
+                        <div class="tree tree4"></div>
+                        
+                        <!-- Parking Spots -->
+                        <div class="parking-spot parking-spot1">
+                            <div class="car"></div>
+                        </div>
+                        <div class="parking-spot parking-spot2">
+                            <div class="car"></div>
+                        </div>
+                        <div class="parking-spot parking-spot3">
+                            <div class="car car-active"></div>
+                        </div>
+                        
+                        <!-- Charging Stations -->
+                        <div class="charging-station station1">⚡</div>
+                        <div class="charging-station station2">⚡</div>
+                        <div class="charging-station station3">⚡</div>
+                        
+                        <!-- Parking Bubble -->
+                        <div class="parking-bubble">PARKING</div>
+                        
+                        <!-- Arrows -->
+                        <div class="arrow">▶▶▶</div>
+                    </div>
+                </div>
+
+                <div class="instructions">
+                    <div class="instruction-text">
+                        スマートバリアが完全に下りた後、<br>
+                        周囲の安全を確認してから、<br>
+                        駐車してください。
+                    </div>
+                    
+                    <button class="ok-button" onclick="completeParking()">OK</button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-button">☰</div>
+                <div class="nav-button">□</div>
+                <div class="nav-button">◀</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get charger number from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const chargerNumber = urlParams.get('charger') || '1';
+
+        function completeParking() {
+            // Here you can navigate to the next step or completion page
+            alert('駐車が完了しました！充電を開始します。');
+            // window.location.href = 'evcharge-complete.html';
+        }
+
+        // Animate car entry after page load
+        setTimeout(() => {
+            const activeCar = document.querySelector('.car-active');
+            if (activeCar) {
+                activeCar.style.animation = 'driveIn 2s ease-out';
+            }
+        }, 500);
+    </script>
+</body>
+</html>
