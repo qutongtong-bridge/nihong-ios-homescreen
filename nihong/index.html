@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nihong - iOS Style Home Screen</title>
+    <title>iOS Home Screen</title>
     <style>
         * {
             margin: 0;
@@ -12,15 +12,12 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #2196F3 0%, #00BCD4 25%, #4CAF50 50%, #FF9800 75%, #2196F3 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background-color: #000;
             min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f0f0f0;
         }
 
         .phone-container {
@@ -37,308 +34,258 @@
         .phone-screen {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #2196F3 0%, #00BCD4 25%, #4CAF50 50%, #FF9800 75%, #2196F3 100%);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FF6347 50%, #DC143C 75%, #8B008B 100%);
+            background-size: cover;
             border-radius: 30px;
             overflow: hidden;
             position: relative;
         }
 
-        .container {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header */
-        .header {
+        /* Status Bar */
+        .status-bar {
+            background: transparent;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
             font-size: 14px;
+            color: #fff;
         }
 
-        .header-left {
-            flex: 1;
+        .status-left {
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
-        .header-center {
-            flex: 1;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .header-right {
-            flex: 1;
+        .status-right {
             display: flex;
-            justify-content: flex-end;
             align-items: center;
-        }
-
-        .battery {
-            width: 24px;
-            height: 12px;
-            border: 1px solid white;
-            border-radius: 2px;
-            padding: 1px;
-        }
-
-        .battery-level {
-            height: 100%;
-            background: white;
-            border-radius: 1px;
+            gap: 5px;
         }
 
         /* App Grid */
         .app-grid {
-            flex: 1;
             padding: 20px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 30px 20px;
-            align-content: start;
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .app-item {
+        .app-icon {
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 8px;
             cursor: pointer;
             transition: transform 0.2s;
         }
 
-        .app-item:active {
-            transform: scale(0.95);
+        .app-icon:active {
+            transform: scale(0.9);
         }
 
-        .app-icon {
+        .icon-wrapper {
             width: 60px;
             height: 60px;
-            border-radius: 14px;
-            margin-bottom: 8px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .app-icon-placeholder {
-            width: 45px;
-            height: 45px;
-            font-size: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            overflow: hidden;
         }
 
         .app-name {
             font-size: 12px;
+            color: #fff;
             text-align: center;
-            max-width: 74px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
-        .app-badge {
+        /* evcharge App Icon */
+        .evcharge-icon {
+            background: linear-gradient(135deg, #FF8C00, #FF6347);
+            box-shadow: 0 2px 10px rgba(255, 140, 0, 0.3);
+            position: relative;
+        }
+
+        .evcharge-icon::before {
+            content: '';
             position: absolute;
-            bottom: 2px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #000;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 25px;
+            background: #fff;
+            border-radius: 5px 5px 3px 3px;
+        }
+
+        .evcharge-icon::after {
+            content: 'STAGING';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 8px;
-            font-weight: 600;
-            padding: 1px 6px;
-            border-radius: 3px;
+            color: #fff;
+            font-weight: bold;
         }
 
-        /* Bottom Section */
-        .bottom-section {
-            padding-bottom: 20px;
+        /* Other App Icons */
+        .settings-icon {
+            background: linear-gradient(135deg, #757575, #424242);
         }
 
-        .page-indicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            gap: 8px;
+        .settings-icon::before {
+            content: '⚙️';
+            font-size: 30px;
         }
 
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
+        .camera-icon {
+            background: linear-gradient(135deg, #9E9E9E, #616161);
         }
 
-        .dot.active {
-            background: rgba(255, 255, 255, 0.9);
+        .camera-icon::before {
+            content: '📷';
+            font-size: 30px;
+        }
+
+        .photos-icon {
+            background: linear-gradient(135deg, #FFC107, #F57C00);
+        }
+
+        .photos-icon::before {
+            content: '🖼️';
+            font-size: 30px;
         }
 
         /* Dock */
-        .dock-container {
-            margin: 0 10px 10px;
-        }
-
         .dock {
-            background: rgba(255, 255, 255, 0.3);
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 10px 20px;
+            border-radius: 25px;
+            padding: 15px;
             display: flex;
             justify-content: space-around;
-            align-items: center;
         }
 
-        /* Dynamic Island */
-        .dynamic-island {
+        .dock .app-icon {
+            gap: 5px;
+        }
+
+        /* Bottom Indicator */
+        .bottom-indicator {
             position: absolute;
-            top: 10px;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 120px;
-            height: 30px;
-            background: #000;
-            border-radius: 20px;
-            z-index: 100;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            body {
-                background: #e0e0e0;
-            }
-            
-            .phone-container {
-                transform: scale(0.9);
-            }
+            width: 134px;
+            height: 5px;
+            background: #fff;
+            border-radius: 3px;
         }
     </style>
 </head>
 <body>
     <div class="phone-container">
         <div class="phone-screen">
-            <div class="dynamic-island"></div>
-            <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-left">
-                <span>Carrier</span>
-                <span>📶</span>
-            </div>
-            <div class="header-center">7:16 PM</div>
-            <div class="header-right">
-                <div class="battery">
-                    <div class="battery-level"></div>
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span>9:41</span>
+                </div>
+                <div class="status-right">
+                    <span>📶</span>
+                    <span>📶</span>
+                    <span>🔋 100%</span>
                 </div>
             </div>
-        </div>
 
-        <!-- App Grid -->
-        <div class="app-grid">
-            <div class="app-item">
-                <div class="app-icon" style="background-color: #1C1C1E;">
-                    <div class="app-icon-placeholder">⌚</div>
+            <!-- App Grid -->
+            <div class="app-grid">
+                <div class="app-icon" onclick="openEvcharge()">
+                    <div class="icon-wrapper evcharge-icon"></div>
+                    <span class="app-name">evcharge</span>
                 </div>
-                <div class="app-name">Watch</div>
-            </div>
-
-            <div class="app-item">
-                <div class="app-icon" style="background-color: #E5E5EA;">
-                    <div class="app-icon-placeholder">👤</div>
+                <div class="app-icon">
+                    <div class="icon-wrapper" style="background: #000;">
+                        <span style="font-size: 30px;">⌚</span>
+                    </div>
+                    <span class="app-name">Watch</span>
                 </div>
-                <div class="app-name">Contacts</div>
-            </div>
-
-            <div class="app-item">
-                <div class="app-icon" style="background-color: #007AFF;">
-                    <div class="app-icon-placeholder">📁</div>
+                <div class="app-icon">
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #4CAF50, #8BC34A);">
+                        <span style="font-size: 30px;">👤</span>
+                    </div>
+                    <span class="app-name">連絡先</span>
                 </div>
-                <div class="app-name">Files</div>
-            </div>
-
-            <div class="app-item">
-                <div class="app-icon" style="background-color: #8E44AD;">
-                    <div class="app-icon-placeholder">⚡</div>
+                <div class="app-icon">
+                    <div class="icon-wrapper" style="background: #2196F3;">
+                        <span style="font-size: 30px;">📁</span>
+                    </div>
+                    <span class="app-name">ファイル</span>
                 </div>
-                <div class="app-name">Shortcuts</div>
-            </div>
-
-            <div class="app-item">
-                <div class="app-icon" style="background-color: #F5F5F5;">
-                    <div class="app-icon-placeholder">✏️</div>
+                <div class="app-icon">
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #9C27B0, #E91E63);">
+                        <span style="font-size: 30px;">⚡</span>
+                    </div>
+                    <span class="app-name">ショートカット</span>
                 </div>
-                <div class="app-name">Freeform</div>
-            </div>
-
-            <div class="app-item">
-                <div class="app-icon" style="background-color: #00C853;">
-                    <div class="app-icon-placeholder">🚗</div>
-                    <div class="app-badge">STAGING</div>
+                <div class="app-icon">
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #FF9800, #FFD700);">
+                        <span style="font-size: 30px;">✏️</span>
+                    </div>
+                    <span class="app-name">フリーフォーム</span>
                 </div>
-                <div class="app-name">Myブラゴ</div>
-            </div>
-
-            <div class="app-item" onclick="openEvcharge()">
-                <div class="app-icon" style="background-color: #FF6D00;">
-                    <div class="app-icon-placeholder">🔋</div>
-                    <div class="app-badge">STAGING</div>
+                <div class="app-icon">
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #3F51B5, #2196F3);">
+                        <span style="font-size: 30px;">🎮</span>
+                    </div>
+                    <span class="app-name">Myブラゴ</span>
                 </div>
-                <div class="app-name">evcharge</div>
-            </div>
-        </div>
-
-        <!-- Bottom Section -->
-        <div class="bottom-section">
-            <!-- Page Indicator -->
-            <div class="page-indicator">
-                <div class="dot active"></div>
-                <div class="dot"></div>
+                <div class="app-icon">
+                    <div class="icon-wrapper settings-icon"></div>
+                    <span class="app-name">設定</span>
+                </div>
             </div>
 
             <!-- Dock -->
-            <div class="dock-container">
-                <div class="dock">
-                    <div class="app-item">
-                        <div class="app-icon" style="background-color: #007AFF;">
-                            <div class="app-icon-placeholder">🧭</div>
-                        </div>
-                        <div class="app-name">Safari</div>
+            <div class="dock">
+                <div class="app-icon">
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #1E90FF, #4169E1);">
+                        <span style="font-size: 30px;">🧭</span>
                     </div>
-
-                    <div class="app-item">
-                        <div class="app-icon" style="background-color: #00C853;">
-                            <div class="app-icon-placeholder">💬</div>
-                        </div>
-                        <div class="app-name">Messages</div>
+                    <span class="app-name">Safari</span>
+                </div>
+                <div class="app-icon">
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #32CD32, #228B22);">
+                        <span style="font-size: 30px;">💬</span>
                     </div>
+                    <span class="app-name">メッセージ</span>
                 </div>
             </div>
-        </div>
+
+            <!-- Page Dots -->
+            <div style="position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.8);"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.3);"></div>
             </div>
+
+            <!-- Bottom Indicator -->
+            <div class="bottom-indicator"></div>
         </div>
     </div>
 
     <script>
-        // Function to open evcharge checkin page
         function openEvcharge() {
-            event.stopPropagation();
-            window.location.href = 'evcharge-checkin.html';
+            window.location.href = 'evcharge-search.html';
         }
-
-        // Add click handlers for other apps
-        document.querySelectorAll('.app-item:not([onclick])').forEach(app => {
-            app.addEventListener('click', function() {
-                const appName = this.querySelector('.app-name').textContent;
-                console.log(`Clicked on ${appName}`);
-            });
-        });
     </script>
 </body>
 </html>

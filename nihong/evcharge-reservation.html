@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>evcharge - きたやま関電施設</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #f5f5f5;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #000;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .back-button {
+            width: 35px;
+            height: 35px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .header-title {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 600;
+            color: #FF6B35;
+            text-align: center;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header-icon {
+            width: 35px;
+            height: 35px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Station Info */
+        .station-info {
+            background: #fff;
+            margin: 8px;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .station-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-icon {
+            width: 35px;
+            height: 35px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .status-text {
+            font-size: 16px;
+            color: #FF6B35;
+        }
+
+        .station-details {
+            color: #666;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .no-image {
+            background: #E8EBF0;
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            float: right;
+            margin-left: 10px;
+            margin-bottom: 5px;
+        }
+
+        .no-image-icon {
+            font-size: 24px;
+            color: #999;
+            margin-bottom: 2px;
+        }
+
+        .no-image-text {
+            font-size: 10px;
+            color: #999;
+        }
+
+        /* Location Section */
+        .location-section {
+            background: #fff;
+            margin: 0 8px 8px 8px;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .location-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .location-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .location-icon {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .location-text {
+            flex: 1;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .detail-button {
+            background: #f0f0f0;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #333;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Charging Options */
+        .charging-options {
+            padding: 0 8px;
+            display: flex;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .charging-option {
+            flex: 1;
+            background: #fff;
+            padding: 10px 8px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .charging-option:active {
+            transform: scale(0.95);
+        }
+
+        .charging-option.active {
+            border: 2px solid #FF6B35;
+        }
+
+        .charging-option.active .option-icon,
+        .charging-option.active .option-title {
+            color: #FF6B35;
+        }
+
+        .option-icon {
+            font-size: 22px;
+            margin-bottom: 3px;
+        }
+
+        .option-title {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .option-subtitle {
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* Reservation Date */
+        .reservation-section {
+            background: #fff;
+            margin: 0 8px 8px 8px;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .reservation-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .reservation-date {
+            font-size: 16px;
+            color: #333;
+            text-align: center;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        /* Charger Info */
+        .charger-info {
+            background: #E8EBF0;
+            margin: 0 8px 8px 8px;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .charger-details {
+            flex: 1;
+        }
+
+        .charger-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .charger-specs {
+            font-size: 10px;
+            color: #999;
+        }
+
+        .charger-icon {
+            width: 40px;
+            height: 40px;
+            background: #999;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        /* Help Link */
+        .help-link {
+            margin: 0 8px 8px 8px;
+            text-align: center;
+        }
+
+        .help-link a {
+            color: #007AFF;
+            text-decoration: none;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        /* Confirm Button */
+        .confirm-button {
+            margin: 0 8px 70px 8px;
+        }
+
+        .confirm-button button {
+            width: 100%;
+            background: #E8EBF0;
+            color: #666;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            height: 50px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 30px 30px;
+            z-index: 100;
+        }
+
+        .nav-button {
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            border-radius: 30px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            border-radius: 30px 30px 0 0;
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            text-align: center;
+            padding: 15px 20px 10px;
+            position: relative;
+        }
+
+        .modal-indicator {
+            width: 50px;
+            height: 4px;
+            background: #ccc;
+            border-radius: 2px;
+            margin: 0 auto 15px;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #00BCD4;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .modal-body {
+            padding: 0 25px 30px;
+            text-align: center;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-illustration {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .caution-text {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            color: #00BCD4;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .illustration-person {
+            width: 80px;
+            height: 100px;
+            background: #f0f0f0;
+            border-radius: 40px 40px 0 0;
+            position: relative;
+            margin-top: 30px;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            top: -10px;
+            right: -40px;
+            width: 50px;
+            height: 50px;
+            background: #FF6B35;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            color: #00BCD4;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .modal-note {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .modal-checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .modal-checkbox input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .modal-button {
+            width: 100%;
+            padding: 15px;
+            background: #FF6B35;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Reserve Modal Styles */
+        .reserve-illustration {
+            width: 100%;
+            height: 150px;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .waiting-text {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: #00BCD4;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .car-container {
+            position: relative;
+            width: 100%;
+            height: 100px;
+        }
+
+        .car-path {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .car-icon {
+            position: absolute;
+            left: 30px;
+            top: 50px;
+            font-size: 30px;
+            transform: rotate(-15deg);
+        }
+
+        .charger-station {
+            position: absolute;
+            right: 40px;
+            bottom: 10px;
+            width: 40px;
+            height: 60px;
+        }
+
+        .charger-body {
+            width: 40px;
+            height: 50px;
+            background: #333;
+            border-radius: 5px;
+        }
+
+        .charger-cable {
+            position: absolute;
+            left: 10px;
+            top: 20px;
+            width: 20px;
+            height: 30px;
+            border: 3px solid #666;
+            border-radius: 10px;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div>8:00</div>
+                <div>🔋 100%</div>
+            </div>
+
+            <!-- Header -->
+            <div class="header">
+                <div class="back-button" onclick="goBack()">←</div>
+                <div class="header-title" id="stationName">きたやま関電施設</div>
+                <div class="header-icons">
+                    <div class="header-icon">🔔</div>
+                    <div class="header-icon">❤️</div>
+                </div>
+            </div>
+
+            <!-- Station Info -->
+            <div class="station-info">
+                <div class="no-image">
+                    <div class="no-image-icon">🖼️</div>
+                    <div class="no-image-text">No image</div>
+                </div>
+                <div class="station-status">
+                    <div class="status-icon">⚡</div>
+                    <div class="status-text" id="stationStatus">急速:1/1</div>
+                </div>
+                <div class="station-details">
+                    現在地から <span id="stationDistance">56m</span><br>
+                    営業中｜<span id="stationHours">8:00〜23:00</span>
+                </div>
+            </div>
+
+            <!-- Location Section -->
+            <div class="location-section">
+                <div class="location-row">
+                    <span class="location-icon">📍</span>
+                    <span class="location-text" id="stationAddress">東京都品川区北品川5-3-1</span>
+                </div>
+                <div class="location-row">
+                    <span class="location-icon">📅</span>
+                    <span class="location-text">定休日なし</span>
+                    <button class="detail-button">詳細</button>
+                </div>
+            </div>
+
+            <!-- Charging Options -->
+            <div class="charging-options">
+                <div class="charging-option" onclick="selectOption('now')" data-option="now">
+                    <div class="option-icon">🔌</div>
+                    <div class="option-title">今すぐ</div>
+                </div>
+                <div class="charging-option" onclick="selectOption('reserve')" data-option="reserve">
+                    <div class="option-icon">⏰</div>
+                    <div class="option-title">取り置き</div>
+                    <div class="option-subtitle">1h</div>
+                </div>
+                <div class="charging-option active" onclick="selectOption('oneday')" data-option="oneday">
+                    <div class="option-icon">📅</div>
+                    <div class="option-title">1日予約</div>
+                </div>
+            </div>
+
+            <!-- Reservation Date -->
+            <div class="reservation-section">
+                <div class="reservation-label">予約日</div>
+                <div class="reservation-date">2024/2/15</div>
+            </div>
+
+            <!-- Charger Info -->
+            <div class="charger-info">
+                <div class="charger-details">
+                    <div class="charger-title" id="chargerTitle">急速 100kW ¥50/分</div>
+                    <div class="charger-specs" id="chargerSpecs">最大 60分｜ケーブル有</div>
+                </div>
+                <div class="charger-icon">🔌</div>
+            </div>
+
+            <!-- Help Link -->
+            <div class="help-link">
+                <a href="#" onclick="showHelpModal(); return false;">
+                    <span>❓</span>
+                    <span>1日予約とは？</span>
+                </a>
+            </div>
+
+            <!-- Confirm Button -->
+            <div class="confirm-button">
+                <button onclick="confirmReservation()">内容確認画面へ</button>
+            </div>
+
+            <!-- Help Modal -->
+            <div id="helpModal" class="modal-overlay" onclick="closeHelpModal()">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <div class="modal-indicator"></div>
+                        <button class="modal-close" onclick="closeHelpModal()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <h2 class="modal-title">1日予約とは？</h2>
+                        <div class="modal-illustration">
+                            <div class="caution-text">CAUTION</div>
+                            <div class="illustration-person">
+                                <div class="speech-bubble">!</div>
+                            </div>
+                        </div>
+                        <div class="modal-text">
+                            3ヶ月先まで<br>
+                            日付を指定して車室を確保できます。<br>
+                            長時間滞在するお出かけ先で、便利です。
+                        </div>
+                        <div class="modal-note">
+                            ※1日予約のご利用、<br>
+                            当日のキャンセルには料金がかかります。
+                        </div>
+                        <div class="modal-checkbox">
+                            <input type="checkbox" id="dontShowAgain">
+                            <label for="dontShowAgain">次回から表示しない</label>
+                        </div>
+                        <button class="modal-button" onclick="closeHelpModal()">OK</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reserve Modal -->
+            <div id="reserveModal" class="modal-overlay" onclick="closeReserveModal()">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <div class="modal-indicator"></div>
+                        <button class="modal-close" onclick="closeReserveModal()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <h2 class="modal-title">取り置きとは？</h2>
+                        <div class="reserve-illustration">
+                            <div class="waiting-text">WAITING...</div>
+                            <div class="car-container">
+                                <svg class="car-path" viewBox="0 0 400 200">
+                                    <path d="M 50 150 Q 200 50 350 150" stroke="#FF6B35" stroke-width="3" fill="none" stroke-dasharray="5,5"/>
+                                </svg>
+                                <div class="car-icon">🚗</div>
+                            </div>
+                            <div class="charger-station">
+                                <div class="charger-body"></div>
+                                <div class="charger-cable"></div>
+                            </div>
+                        </div>
+                        <div class="modal-text">
+                            最大60分間、空いている車室を<br>
+                            取り置きできます。<br>
+                            「今すぐあそこに行きたい！」という時に、<br>
+                            確実に車室を確保いただけます。
+                        </div>
+                        <div class="modal-note">
+                            ※取り置きのキャンセルには、キャンセル料金が発生します。
+                        </div>
+                        <div class="modal-checkbox">
+                            <input type="checkbox" id="dontShowReserve">
+                            <label for="dontShowReserve">次回から表示しない</label>
+                        </div>
+                        <button class="modal-button" onclick="closeReserveModal()">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-button">☰</div>
+            <div class="nav-button" onclick="window.location.href='index.html'">□</div>
+            <div class="nav-button" onclick="window.history.back()">◀</div>
+        </div>
+    </div>
+
+    <script>
+        // 获取URL参数
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                station: params.get('station'),
+                name: params.get('name'),
+                distance: params.get('distance'),
+                address: params.get('address'),
+                hours: params.get('hours'),
+                status: params.get('status')
+            };
+        }
+
+        // 页面加载时更新信息
+        window.onload = function() {
+            const params = getUrlParams();
+            if (params.name) {
+                document.getElementById('stationName').textContent = params.name;
+            }
+            if (params.status) {
+                document.getElementById('stationStatus').textContent = params.status;
+                // 根据状态调整图标颜色
+                const statusIcon = document.querySelector('.status-icon');
+                if (params.status.includes('普通')) {
+                    statusIcon.style.background = '#4CAF50';
+                }
+            }
+            if (params.distance) {
+                document.getElementById('stationDistance').textContent = params.distance;
+            }
+            if (params.hours) {
+                document.getElementById('stationHours').textContent = params.hours;
+            }
+            if (params.address) {
+                document.getElementById('stationAddress').textContent = params.address;
+            }
+            
+            // 根据充电站类型更新充电器信息
+            if (params.station === '2') {
+                // SBPSテスト - 普通充电
+                document.getElementById('chargerTitle').textContent = '普通 6kW ¥30/分';
+                document.getElementById('chargerSpecs').textContent = '最大 180分｜ケーブル有';
+            }
+        };
+
+        function goBack() {
+            window.location.href = 'evcharge-search.html';
+        }
+
+        function confirmReservation() {
+            // 跳转到确认页面
+            window.location.href = 'evcharge-reserve-confirm.html';
+        }
+
+        function showHelpModal() {
+            document.getElementById('helpModal').classList.add('show');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('helpModal').classList.remove('show');
+        }
+
+        function showReserveModal() {
+            document.getElementById('reserveModal').classList.add('show');
+        }
+
+        function closeReserveModal() {
+            document.getElementById('reserveModal').classList.remove('show');
+        }
+
+        function selectOption(option) {
+            // 移除所有active类
+            document.querySelectorAll('.charging-option').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            
+            // 添加active类到选中的选项
+            const selectedOption = document.querySelector(`[data-option="${option}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('active');
+            }
+            
+            // 根据选择显示不同的弹窗
+            if (option === 'reserve') {
+                showReserveModal();
+            } else if (option === 'oneday') {
+                // 1日予約已经选中，不做任何操作
+            } else if (option === 'now') {
+                // 今すぐ选项，可以添加相应的处理
+            }
+        }
+    </script>
+</body>
+</html>

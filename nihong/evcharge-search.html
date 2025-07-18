@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>evcharge - 検索</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #f5f5f5;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #000;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Search Bar */
+        .search-container {
+            background: #fff;
+            margin: 15px;
+            border-radius: 25px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-arrow {
+            font-size: 20px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #999;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        /* Station List */
+        .station-list {
+            padding: 0 15px;
+            height: calc(100% - 200px);
+            overflow-y: auto;
+        }
+
+        .station-item {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .station-item:active {
+            transform: scale(0.98);
+        }
+
+        .station-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .station-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .station-icon.blue {
+            background: #00BCD4;
+        }
+
+        .station-icon.orange {
+            background: #FF6B35;
+        }
+
+        .station-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: #fff;
+        }
+
+        .station-info {
+            flex: 1;
+        }
+
+        .station-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .station-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.fast {
+            background: #FF6B35;
+        }
+
+        .status-dot.normal {
+            background: #4CAF50;
+        }
+
+        .status-label {
+            font-weight: 600;
+        }
+
+        .status-label.fast {
+            color: #FF6B35;
+        }
+
+        .status-label.normal {
+            color: #4CAF50;
+        }
+
+        .station-distance {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .station-address {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .station-hours {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button {
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span>7:09</span>
+                </div>
+                <div class="status-right">
+                    <span>📶</span>
+                    <span>📶</span>
+                    <span>🔋 100%</span>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="back-arrow" onclick="goBack()">←</div>
+                <input type="text" class="search-input" placeholder="行き先はどちらですか？" readonly>
+            </div>
+
+            <!-- Station List -->
+            <div class="station-list">
+                <div class="station-item" onclick="selectStation(1)">
+                    <div class="station-header">
+                        <div class="station-icon blue">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 2v11h3v9l7-12h-4l3-8z"/>
+                            </svg>
+                        </div>
+                        <div class="station-info">
+                            <h3 class="station-name">きたやま関電施設</h3>
+                            <div class="station-status">
+                                <div class="status-dot fast"></div>
+                                <span class="status-label fast">急速:1/1</span>
+                            </div>
+                            <div class="station-distance">57m｜東京都品川区北品川5-3-1</div>
+                            <div class="station-hours">営業中｜8:00〜23:00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="station-item" onclick="selectStation(2)">
+                    <div class="station-header">
+                        <div class="station-icon orange">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 2v11h3v9l7-12h-4l3-8z"/>
+                            </svg>
+                        </div>
+                        <div class="station-info">
+                            <h3 class="station-name">SBPSテスト</h3>
+                            <div class="station-status">
+                                <div class="status-dot normal"></div>
+                                <span class="status-label normal">普通:0/1</span>
+                            </div>
+                            <div class="station-distance">510m｜東京都品川区大崎２丁目１−１</div>
+                            <div class="station-hours">営業中｜6:00〜22:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav" style="bottom: 10px;">
+                <div class="nav-button">☰</div>
+                <div class="nav-button" onclick="window.location.href='index.html'">□</div>
+                <div class="nav-button" onclick="window.history.back()">◀</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        function selectStation(id) {
+            if (id === 1) {
+                // 第一个充电站跳转到预约页面
+                window.location.href = 'evcharge-reservation.html?station=1&name=きたやま関電施設&distance=56m&address=東京都品川区北品川5-3-1&hours=8:00〜23:00&status=急速:1/1';
+            } else if (id === 2) {
+                // 第二个充电站也跳转到预约页面
+                window.location.href = 'evcharge-reservation.html?station=2&name=SBPSテスト&distance=510m&address=東京都品川区大崎２丁目１−１&hours=6:00〜22:00&status=普通:0/1';
+            } else {
+                // 其他充电站跳转到充电器选择页面
+                window.location.href = 'evcharge-checkin.html';
+            }
+        }
+    </script>
+</body>
+</html>
