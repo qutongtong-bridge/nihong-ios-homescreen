@@ -213,7 +213,7 @@
                     <div class="icon-wrapper evcharge-icon"></div>
                     <span class="app-name">evcharge</span>
                 </div>
-                <div class="app-icon">
+                <div class="app-icon" onclick="openWatch()">
                     <div class="icon-wrapper" style="background: #000;">
                         <span style="font-size: 30px;">⌚</span>
                     </div>
@@ -285,6 +285,10 @@
     <script>
         function openEvcharge() {
             window.location.href = 'evcharge-search.html';
+        }
+        
+        function openWatch() {
+            window.location.href = 'watch.html';
         }
         
         function openSettings() {

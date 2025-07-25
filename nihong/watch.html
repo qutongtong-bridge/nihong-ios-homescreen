@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>彩虹小狗充电器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            background: transparent;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .charging-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .battery-level {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .charging-status {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .time-info {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .dog-container {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            margin: 20px auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        #three-canvas {
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <div class="status-bar">
+                <button class="back-button" onclick="goBack()">← 返回</button>
+                <span>9:41</span>
+                <span>🔋 100%</span>
+            </div>
+            
+            <div class="main-content">
+                <h1 class="title">🐕 彩虹小狗充电器</h1>
+                
+                <div class="charging-info">
+                    <div class="battery-level" id="batteryLevel">0%</div>
+                    <div class="charging-status">正在充电中...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="time-info" id="timeInfo">充电时间: 0分0秒</div>
+                </div>
+
+                <div class="dog-container">
+                    <canvas id="three-canvas"></canvas>
+                </div>
+
+                <div class="controls">
+                    <button class="control-btn" onclick="startCharging()">开始充电</button>
+                    <button class="control-btn" onclick="stopCharging()">停止充电</button>
+                    <button class="control-btn" onclick="resetCharging()">重置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js and GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <script>
+        // 全局变量
+        let scene, camera, renderer, dog, dogGroup;
+        let isCharging = false;
+        let chargingStartTime = null;
+        let currentBatteryLevel = 0;
+        let animationId;
+
+        // 初始化Three.js场景
+        function initThreeJS() {
+            const canvas = document.getElementById('three-canvas');
+            const container = document.querySelector('.dog-container');
+            
+            // 创建场景
+            scene = new THREE.Scene();
+            
+            // 创建相机
+            camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // 创建渲染器
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                antialias: true, 
+                alpha: true 
+            });
+            renderer.setSize(300, 300);
+            renderer.setClearColor(0x000000, 0);
+            
+            // 添加光源
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // 创建小狗组
+            dogGroup = new THREE.Group();
+            scene.add(dogGroup);
+            
+            // 创建小狗
+            createDog();
+            
+            // 开始渲染循环
+            animate();
+        }
+
+        // 创建3D小狗模型
+        function createDog() {
+            // 创建彩虹材质
+            const rainbowMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0 },
+                    colorIntensity: { value: 0.5 }
+                },
+                vertexShader: `
+                    varying vec3 vPosition;
+                    varying vec3 vNormal;
+                    void main() {
+                        vPosition = position;
+                        vNormal = normal;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float time;
+                    uniform float colorIntensity;
+                    varying vec3 vPosition;
+                    varying vec3 vNormal;
+                    
+                    void main() {
+                        float r = sin(vPosition.x * 2.0 + time) * 0.5 + 0.5;
+                        float g = sin(vPosition.y * 2.0 + time + 2.0) * 0.5 + 0.5;
+                        float b = sin(vPosition.z * 2.0 + time + 4.0) * 0.5 + 0.5;
+                        
+                        vec3 rainbow = vec3(r, g, b) * colorIntensity + vec3(0.3, 0.3, 0.3);
+                        gl_FragColor = vec4(rainbow, 1.0);
+                    }
+                `
+            });
+
+            // 狗身体
+            const bodyGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+            const body = new THREE.Mesh(bodyGeometry, rainbowMaterial);
+            body.scale.set(1, 0.8, 1.2);
+            
+            // 狗头
+            const headGeometry = new THREE.SphereGeometry(0.6, 16, 16);
+            const head = new THREE.Mesh(headGeometry, rainbowMaterial);
+            head.position.set(0, 0.7, 0.8);
+            
+            // 狗耳朵
+            const earGeometry = new THREE.SphereGeometry(0.25, 8, 8);
+            const leftEar = new THREE.Mesh(earGeometry, rainbowMaterial);
+            leftEar.position.set(-0.4, 1.1, 0.8);
+            leftEar.scale.set(1, 1.5, 0.5);
+            
+            const rightEar = new THREE.Mesh(earGeometry, rainbowMaterial);
+            rightEar.position.set(0.4, 1.1, 0.8);
+            rightEar.scale.set(1, 1.5, 0.5);
+            
+            // 狗鼻子
+            const noseGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+            const noseMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            const nose = new THREE.Mesh(noseGeometry, noseMaterial);
+            nose.position.set(0, 0.6, 1.3);
+            
+            // 狗眼睛
+            const eyeGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+            const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            
+            const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            leftEye.position.set(-0.2, 0.8, 1.2);
+            
+            const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            rightEye.position.set(0.2, 0.8, 1.2);
+            
+            // 狗腿
+            const legGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.8, 8);
+            const frontLeftLeg = new THREE.Mesh(legGeometry, rainbowMaterial);
+            frontLeftLeg.position.set(-0.5, -0.8, 0.5);
+            
+            const frontRightLeg = new THREE.Mesh(legGeometry, rainbowMaterial);
+            frontRightLeg.position.set(0.5, -0.8, 0.5);
+            
+            const backLeftLeg = new THREE.Mesh(legGeometry, rainbowMaterial);
+            backLeftLeg.position.set(-0.5, -0.8, -0.5);
+            
+            const backRightLeg = new THREE.Mesh(legGeometry, rainbowMaterial);
+            backRightLeg.position.set(0.5, -0.8, -0.5);
+            
+            // 狗尾巴
+            const tailGeometry = new THREE.CylinderGeometry(0.1, 0.15, 1, 8);
+            const tail = new THREE.Mesh(tailGeometry, rainbowMaterial);
+            tail.position.set(0, 0.2, -1.2);
+            tail.rotation.x = Math.PI / 4;
+            
+            // 将所有部分添加到狗组
+            dogGroup.add(body);
+            dogGroup.add(head);
+            dogGroup.add(leftEar);
+            dogGroup.add(rightEar);
+            dogGroup.add(nose);
+            dogGroup.add(leftEye);
+            dogGroup.add(rightEye);
+            dogGroup.add(frontLeftLeg);
+            dogGroup.add(frontRightLeg);
+            dogGroup.add(backLeftLeg);
+            dogGroup.add(backRightLeg);
+            dogGroup.add(tail);
+            
+            // 设置初始大小（很小）
+            dogGroup.scale.set(0.3, 0.3, 0.3);
+            
+            // 存储材质引用以便后续更新
+            dog = {
+                materials: [rainbowMaterial],
+                group: dogGroup
+            };
+        }
+
+        // 动画循环
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            
+            // 更新时间用于彩虹效果
+            if (dog && dog.materials) {
+                dog.materials.forEach(material => {
+                    if (material.uniforms && material.uniforms.time) {
+                        material.uniforms.time.value += 0.01;
+                    }
+                });
+            }
+            
+            // 小狗持续旋转
+            if (dogGroup) {
+                dogGroup.rotation.y += 0.01;
+                dogGroup.rotation.x = Math.sin(Date.now() * 0.001) * 0.1;
+            }
+            
+            // 如果正在充电，更新充电状态
+            if (isCharging) {
+                updateChargingStatus();
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        // 更新充电状态
+        function updateChargingStatus() {
+            if (!chargingStartTime) return;
+            
+            const currentTime = Date.now();
+            const elapsedTime = (currentTime - chargingStartTime) / 1000; // 秒
+            
+            // 计算充电进度 (假设100秒充满)
+            const progress = Math.min(elapsedTime / 100, 1);
+            currentBatteryLevel = Math.floor(progress * 100);
+            
+            // 更新UI
+            document.getElementById('batteryLevel').textContent = currentBatteryLevel + '%';
+            document.getElementById('progressFill').style.width = currentBatteryLevel + '%';
+            
+            // 更新时间显示
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = Math.floor(elapsedTime % 60);
+            document.getElementById('timeInfo').textContent = `充电时间: ${minutes}分${seconds}秒`;
+            
+            // 根据充电进度调整小狗大小 (从0.3到2.0)
+            const scale = 0.3 + (progress * 1.7);
+            if (dogGroup) {
+                gsap.to(dogGroup.scale, {
+                    x: scale,
+                    y: scale,
+                    z: scale,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+            }
+            
+            // 更新彩虹强度
+            if (dog && dog.materials) {
+                dog.materials.forEach(material => {
+                    if (material.uniforms && material.uniforms.colorIntensity) {
+                        material.uniforms.colorIntensity.value = 0.5 + progress * 0.5;
+                    }
+                });
+            }
+            
+            // 充电完成
+            if (progress >= 1) {
+                stopCharging();
+                alert('充电完成！彩虹小狗已经长大了！🐕🌈');
+            }
+        }
+
+        // 开始充电
+        function startCharging() {
+            if (!isCharging) {
+                isCharging = true;
+                chargingStartTime = Date.now();
+                document.querySelector('.charging-status').textContent = '正在充电中...';
+            }
+        }
+
+        // 停止充电
+        function stopCharging() {
+            isCharging = false;
+            chargingStartTime = null;
+            document.querySelector('.charging-status').textContent = '充电已停止';
+        }
+
+        // 重置充电
+        function resetCharging() {
+            stopCharging();
+            currentBatteryLevel = 0;
+            document.getElementById('batteryLevel').textContent = '0%';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('timeInfo').textContent = '充电时间: 0分0秒';
+            document.querySelector('.charging-status').textContent = '准备充电';
+            
+            // 重置小狗大小
+            if (dogGroup) {
+                gsap.to(dogGroup.scale, {
+                    x: 0.3,
+                    y: 0.3,
+                    z: 0.3,
+                    duration: 1,
+                    ease: "power2.out"
+                });
+            }
+            
+            // 重置彩虹强度
+            if (dog && dog.materials) {
+                dog.materials.forEach(material => {
+                    if (material.uniforms && material.uniforms.colorIntensity) {
+                        material.uniforms.colorIntensity.value = 0.5;
+                    }
+                });
+            }
+        }
+
+        // 返回主页
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            initThreeJS();
+        });
+
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
+    </script>
+</body>
+</html>
