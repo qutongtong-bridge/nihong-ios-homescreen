@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>液体电池充电器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-bar {
+            background: transparent;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px 20px 20px 20px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .title {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .charging-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: white;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .battery-level {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .charging-status {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #f1c40f, #2ecc71, #3498db);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .time-info {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .battery-container {
+            width: 280px;
+            height: 280px;
+            position: relative;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #battery-canvas {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 25px;
+            font-size: 13px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .wave-info {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <div class="status-bar">
+                <button class="back-button" onclick="goBack()">← 返回</button>
+                <span>9:41</span>
+                <span>🔋 100%</span>
+            </div>
+            
+            <div class="main-content">
+                <h1 class="title">🔋 液体电池充电器</h1>
+                
+                <div class="charging-info">
+                    <div class="battery-level" id="batteryLevel">0%</div>
+                    <div class="charging-status" id="chargingStatus">准备充电</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="time-info" id="timeInfo">充电时间: 0分0秒</div>
+                </div>
+
+                <div class="battery-container">
+                    <canvas id="battery-canvas" width="280" height="280"></canvas>
+                    <div class="wave-info">
+                        <div>液体晃动效果</div>
+                        <div>颜色随充电进度变化</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="control-btn" onclick="startCharging()">开始充电</button>
+                    <button class="control-btn" onclick="stopCharging()">停止充电</button>
+                    <button class="control-btn" onclick="resetCharging()">重置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let canvas, ctx;
+        let isCharging = false;
+        let chargingStartTime = null;
+        let currentBatteryLevel = 0;
+        let animationId;
+        let time = 0;
+        
+        // 液体波浪参数
+        let waveHeight = 0;
+        let waveAmplitude = 15;
+        let waveFrequency = 0.02;
+        let waveOffset = 0;
+        
+        // 电池参数
+        const batteryWidth = 160;
+        const batteryHeight = 200;
+        const batteryX = 60;
+        const batteryY = 40;
+        const batteryCornerRadius = 20;
+        const batteryCapHeight = 30;
+        const batteryCapWidth = 60;
+        
+        // 颜色配置
+        const colorStages = [
+            { percent: 0, color: { r: 231, g: 76, b: 60 } },    // 红色
+            { percent: 25, color: { r: 243, g: 156, b: 18 } },  // 橙色
+            { percent: 50, color: { r: 241, g: 196, b: 64 } },  // 黄色
+            { percent: 75, color: { r: 46, g: 204, b: 113 } },  // 绿色
+            { percent: 100, color: { r: 52, g: 152, b: 219 } }  // 蓝色
+        ];
+
+        // 初始化Canvas
+        function initCanvas() {
+            canvas = document.getElementById('battery-canvas');
+            ctx = canvas.getContext('2d');
+            
+            // 设置高DPI支持
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            
+            // 开始动画循环
+            animate();
+        }
+
+        // 绘制电池外壳
+        function drawBatteryShell() {
+            ctx.save();
+            
+            // 电池主体
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            
+            // 绘制圆角矩形
+            ctx.beginPath();
+            ctx.roundRect(batteryX, batteryY, batteryWidth, batteryHeight, batteryCornerRadius);
+            ctx.fill();
+            ctx.stroke();
+            
+            // 电池正极帽
+            const capX = batteryX + (batteryWidth - batteryCapWidth) / 2;
+            const capY = batteryY - batteryCapHeight;
+            
+            ctx.beginPath();
+            ctx.roundRect(capX, capY, batteryCapWidth, batteryCapHeight, 10);
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        // 获取当前液体颜色
+        function getCurrentColor(progress) {
+            for (let i = 0; i < colorStages.length - 1; i++) {
+                const current = colorStages[i];
+                const next = colorStages[i + 1];
+                
+                if (progress >= current.percent && progress <= next.percent) {
+                    const t = (progress - current.percent) / (next.percent - current.percent);
+                    return {
+                        r: Math.round(current.color.r + (next.color.r - current.color.r) * t),
+                        g: Math.round(current.color.g + (next.color.g - current.color.g) * t),
+                        b: Math.round(current.color.b + (next.color.b - current.color.b) * t)
+                    };
+                }
+            }
+            return colorStages[0].color;
+        }
+
+        // 绘制液体波浪
+        function drawLiquid() {
+            if (waveHeight <= 0) return;
+            
+            ctx.save();
+            
+            // 设置裁剪区域为电池内部
+            ctx.beginPath();
+            ctx.roundRect(batteryX + 4, batteryY + 4, batteryWidth - 8, batteryHeight - 8, batteryCornerRadius - 4);
+            ctx.clip();
+            
+            const progress = currentBatteryLevel;
+            const color = getCurrentColor(progress);
+            
+            // 创建渐变
+            const gradient = ctx.createLinearGradient(0, batteryY + batteryHeight - waveHeight - 50, 0, batteryY + batteryHeight);
+            gradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, 0.8)`);
+            gradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 1)`);
+            
+            // 绘制液体主体
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.moveTo(batteryX, batteryY + batteryHeight);
+            ctx.lineTo(batteryX, batteryY + batteryHeight - waveHeight);
+            
+            // 绘制波浪表面
+            for (let x = batteryX; x <= batteryX + batteryWidth; x += 2) {
+                const waveY = batteryY + batteryHeight - waveHeight + 
+                    Math.sin((x - batteryX) * waveFrequency + waveOffset) * waveAmplitude * 
+                    Math.sin(time * 0.01) * (waveHeight / (batteryHeight * 0.8));
+                ctx.lineTo(x, waveY);
+            }
+            
+            ctx.lineTo(batteryX + batteryWidth, batteryY + batteryHeight);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 添加液体表面光泽效果
+            const glossGradient = ctx.createLinearGradient(0, batteryY + batteryHeight - waveHeight - 20, 0, batteryY + batteryHeight - waveHeight + 20);
+            glossGradient.addColorStop(0, `rgba(255, 255, 255, 0.3)`);
+            glossGradient.addColorStop(0.5, `rgba(255, 255, 255, 0.1)`);
+            glossGradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
+            
+            ctx.fillStyle = glossGradient;
+            ctx.beginPath();
+            ctx.moveTo(batteryX, batteryY + batteryHeight - waveHeight - 20);
+            
+            for (let x = batteryX; x <= batteryX + batteryWidth; x += 2) {
+                const waveY = batteryY + batteryHeight - waveHeight + 
+                    Math.sin((x - batteryX) * waveFrequency + waveOffset) * waveAmplitude * 
+                    Math.sin(time * 0.01) * (waveHeight / (batteryHeight * 0.8));
+                ctx.lineTo(x, waveY);
+            }
+            
+            for (let x = batteryX + batteryWidth; x >= batteryX; x -= 2) {
+                const waveY = batteryY + batteryHeight - waveHeight + 
+                    Math.sin((x - batteryX) * waveFrequency + waveOffset) * waveAmplitude * 
+                    Math.sin(time * 0.01) * (waveHeight / (batteryHeight * 0.8)) - 40;
+                ctx.lineTo(x, waveY);
+            }
+            
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        // 动画循环
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            
+            time++;
+            waveOffset += 0.05;
+            
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制电池
+            drawBatteryShell();
+            drawLiquid();
+            
+            // 如果正在充电，更新充电状态
+            if (isCharging) {
+                updateChargingStatus();
+            }
+        }
+
+        // 更新充电状态
+        function updateChargingStatus() {
+            if (!chargingStartTime) return;
+            
+            const currentTime = Date.now();
+            const elapsedTime = (currentTime - chargingStartTime) / 1000; // 秒
+            
+            // 计算充电进度 (假设120秒充满)
+            const progress = Math.min(elapsedTime / 120, 1);
+            currentBatteryLevel = Math.floor(progress * 100);
+            
+            // 更新液体高度
+            waveHeight = (batteryHeight - 20) * progress;
+            
+            // 更新UI
+            document.getElementById('batteryLevel').textContent = currentBatteryLevel + '%';
+            document.getElementById('progressFill').style.width = currentBatteryLevel + '%';
+            
+            // 更新时间显示
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = Math.floor(elapsedTime % 60);
+            document.getElementById('timeInfo').textContent = `充电时间: ${minutes}分${seconds}秒`;
+            
+            // 充电完成
+            if (progress >= 1) {
+                stopCharging();
+                document.getElementById('chargingStatus').textContent = '充电完成！';
+                setTimeout(() => {
+                    alert('充电完成！电池已满！🔋✨');
+                }, 500);
+            }
+        }
+
+        // 开始充电
+        function startCharging() {
+            if (!isCharging) {
+                isCharging = true;
+                chargingStartTime = Date.now();
+                document.getElementById('chargingStatus').textContent = '正在充电中...';
+            }
+        }
+
+        // 停止充电
+        function stopCharging() {
+            isCharging = false;
+            chargingStartTime = null;
+            document.getElementById('chargingStatus').textContent = '充电已停止';
+        }
+
+        // 重置充电
+        function resetCharging() {
+            stopCharging();
+            currentBatteryLevel = 0;
+            waveHeight = 0;
+            document.getElementById('batteryLevel').textContent = '0%';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('timeInfo').textContent = '充电时间: 0分0秒';
+            document.getElementById('chargingStatus').textContent = '准备充电';
+        }
+
+        // 返回主页
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            initCanvas();
+        });
+
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
+
+        // 窗口大小改变时重新初始化
+        window.addEventListener('resize', () => {
+            initCanvas();
+        });
+    </script>
+</body>
+</html>

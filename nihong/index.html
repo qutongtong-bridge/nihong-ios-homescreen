@@ -219,7 +219,7 @@
                     </div>
                     <span class="app-name">Watch</span>
                 </div>
-                <div class="app-icon">
+                <div class="app-icon" onclick="openBattery()">
                     <div class="icon-wrapper" style="background: linear-gradient(135deg, #4CAF50, #8BC34A);">
                         <span style="font-size: 30px;">👤</span>
                     </div>
@@ -289,6 +289,10 @@
         
         function openWatch() {
             window.location.href = 'watch.html';
+        }
+        
+        function openBattery() {
+            window.location.href = 'battery.html';
         }
         
         function openSettings() {
