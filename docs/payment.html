@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .payment-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .payment-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .payment-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .amount-section {
+            background: #f7f7f7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .amount-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .amount-value {
+            color: #333;
+            font-size: 36px;
+            font-weight: bold;
+        }
+        
+        .currency {
+            font-size: 24px;
+            margin-right: 5px;
+        }
+        
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+        }
+        
+        .btn-failure {
+            background: linear-gradient(135deg, #f44336, #da190b);
+            color: white;
+        }
+        
+        .btn-failure:hover {
+            background: linear-gradient(135deg, #da190b, #f44336);
+        }
+        
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #666;
+        }
+        
+        .btn-cancel:hover {
+            background: #d0d0d0;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        
+        .message.failure {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+        
+        .message.cancel {
+            background: #fafafa;
+            color: #666;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-header">
+            <h1>支付确认</h1>
+        </div>
+        
+        <div class="amount-section">
+            <div class="amount-label">支付金额</div>
+            <div class="amount-value">
+                <span class="currency">¥</span>
+                <span id="amount">1,280.00</span>
+            </div>
+        </div>
+        
+        <div class="buttons-container">
+            <button class="btn btn-success" onclick="handlePaymentSuccess()">
+                支付成功
+            </button>
+            
+            <button class="btn btn-failure" onclick="handlePaymentFailure()">
+                支付失败
+            </button>
+            
+            <button class="btn btn-cancel" onclick="handlePaymentCancel()">
+                取消支付
+            </button>
+        </div>
+        
+        <div id="message" class="message"></div>
+    </div>
+    
+    <script>
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
+            
+            // 3秒后自动隐藏消息
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+        
+        function handlePaymentSuccess() {
+            showMessage('✅ 支付成功！交易已完成', 'success');
+            console.log('Payment successful');
+        }
+        
+        function handlePaymentFailure() {
+            showMessage('❌ 支付失败！请重试', 'failure');
+            console.log('Payment failed');
+        }
+        
+        function handlePaymentCancel() {
+            showMessage('ℹ️ 支付已取消', 'cancel');
+            console.log('Payment cancelled');
+        }
+    </script>
+</body>
+</html>
