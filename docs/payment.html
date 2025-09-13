@@ -41,6 +41,29 @@
             margin-bottom: 10px;
         }
         
+        .order-info {
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .order-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .order-info-label {
+            color: #666;
+        }
+        
+        .order-info-value {
+            color: #333;
+            font-weight: 500;
+        }
+        
         .amount-section {
             background: #f7f7f7;
             border-radius: 10px;
@@ -144,12 +167,44 @@
             color: #666;
             border: 1px solid #ccc;
         }
+        
+        .debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fffde7;
+            border: 1px solid #f9a825;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .debug-info h3 {
+            color: #f57c00;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .debug-info p {
+            margin: 5px 0;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
     <div class="payment-container">
         <div class="payment-header">
             <h1>支付确认</h1>
+        </div>
+        
+        <div class="order-info">
+            <div class="order-info-item">
+                <span class="order-info-label">订单号：</span>
+                <span class="order-info-value" id="orderId">--</span>
+            </div>
+            <div class="order-info-item">
+                <span class="order-info-label">商品名称：</span>
+                <span class="order-info-value">充电服务</span>
+            </div>
         </div>
         
         <div class="amount-section">
@@ -175,35 +230,153 @@
         </div>
         
         <div id="message" class="message"></div>
+        
+        <!-- 调试信息区域 -->
+        <div class="debug-info">
+            <h3>🔧 开发调试信息</h3>
+            <p><strong>接收到的参数：</strong></p>
+            <p id="debugParams">--</p>
+            <p><strong>返回URL：</strong></p>
+            <p id="debugReturnUrl" style="color: #1976d2;">--</p>
+        </div>
     </div>
     
     <script>
+        // 全局变量存储参数
+        let paymentParams = {
+            orderId: '',
+            amount: '',
+            returnUrl: ''
+        };
+        
+        // 解析URL参数
+        function parseUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            paymentParams.orderId = urlParams.get('orderId') || Date.now().toString();
+            paymentParams.amount = urlParams.get('amount') || '1280';
+            paymentParams.returnUrl = urlParams.get('returnUrl') || '';
+            
+            // 更新页面显示
+            document.getElementById('orderId').textContent = paymentParams.orderId;
+            document.getElementById('amount').textContent = formatAmount(paymentParams.amount);
+            
+            // 显示调试信息
+            document.getElementById('debugParams').textContent = JSON.stringify(paymentParams, null, 2);
+            document.getElementById('debugReturnUrl').textContent = decodeURIComponent(paymentParams.returnUrl) || '未提供返回URL';
+        }
+        
+        // 格式化金额
+        function formatAmount(amount) {
+            const num = parseFloat(amount);
+            return num.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        
+        // 显示消息
         function showMessage(text, type) {
             const messageEl = document.getElementById('message');
             messageEl.textContent = text;
             messageEl.className = 'message ' + type;
             messageEl.style.display = 'block';
             
-            // 3秒后自动隐藏消息
+            // 2秒后跳转回应用
             setTimeout(() => {
                 messageEl.style.display = 'none';
-            }, 3000);
+            }, 2000);
         }
         
+        // 返回到应用
+        function returnToApp(status, message) {
+            // 如果没有返回URL，尝试使用默认的scheme
+            let returnUrl = paymentParams.returnUrl;
+            
+            if (!returnUrl) {
+                // 尝试多种可能的URL Scheme
+                const schemes = [
+                    'exp://192.168.1.100:8081/--/payment-callback',
+                    'exp://localhost:8081/--/payment-callback',
+                    'exp://127.0.0.1:8081/--/payment-callback',
+                    'evcharging://payment-callback'
+                ];
+                returnUrl = schemes[0]; // 使用第一个作为默认
+            } else {
+                // 解码返回URL
+                returnUrl = decodeURIComponent(returnUrl);
+            }
+            
+            // 构建带参数的返回URL
+            const params = new URLSearchParams({
+                status: status,
+                message: message,
+                orderId: paymentParams.orderId,
+                amount: paymentParams.amount,
+                timestamp: new Date().toISOString()
+            });
+            
+            const finalUrl = returnUrl + (returnUrl.includes('?') ? '&' : '?') + params.toString();
+            
+            console.log('Redirecting to:', finalUrl);
+            
+            // 尝试跳转
+            try {
+                // 方法1: 直接设置location
+                window.location.href = finalUrl;
+            } catch (e) {
+                console.error('Failed to redirect:', e);
+                
+                // 方法2: 尝试使用window.open
+                try {
+                    window.open(finalUrl, '_self');
+                } catch (e2) {
+                    console.error('Failed to open URL:', e2);
+                    
+                    // 方法3: 创建一个隐藏的链接并点击
+                    const link = document.createElement('a');
+                    link.href = finalUrl;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        }
+        
+        // 处理支付成功
         function handlePaymentSuccess() {
-            showMessage('✅ 支付成功！交易已完成', 'success');
+            showMessage('✅ 支付成功！正在返回应用...', 'success');
             console.log('Payment successful');
+            
+            // 延迟1秒后返回应用
+            setTimeout(() => {
+                returnToApp('success', '支付成功');
+            }, 1000);
         }
         
+        // 处理支付失败
         function handlePaymentFailure() {
-            showMessage('❌ 支付失败！请重试', 'failure');
+            showMessage('❌ 支付失败！正在返回应用...', 'failure');
             console.log('Payment failed');
+            
+            // 延迟1秒后返回应用
+            setTimeout(() => {
+                returnToApp('failure', '支付失败，请重试');
+            }, 1000);
         }
         
+        // 处理取消支付
         function handlePaymentCancel() {
-            showMessage('ℹ️ 支付已取消', 'cancel');
+            showMessage('ℹ️ 支付已取消，正在返回应用...', 'cancel');
             console.log('Payment cancelled');
+            
+            // 延迟1秒后返回应用
+            setTimeout(() => {
+                returnToApp('cancel', '用户取消支付');
+            }, 1000);
         }
+        
+        // 页面加载时解析参数
+        window.onload = function() {
+            parseUrlParams();
+        };
     </script>
 </body>
 </html>
